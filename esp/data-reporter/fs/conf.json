@@ -1,0 +1,50 @@
+{
+  "debug": {
+    "level": 1,
+    "udp_log_addr": "192.168.0.1:514"
+  },
+  "device": {
+    "id": "em-008",
+    "password": ""
+  },
+  "http": {
+    "enable": true,
+  },
+  "i2c": {
+    "enable": true,
+    "sda_gpio": 14,
+    "scl_gpio": 12
+  },
+  "mqtt": {
+    "clean_session": true,
+    "enable": true,
+    "keep_alive": 60,
+    "pass": "hk92349120",
+    "pub": "wd/em-008/update/online",
+    "server": "api-1.skyhm.net:8883",
+    "ssl_ca_cert": "skylink_ca.pem",
+    "user": "em-008",
+    "will_topic": "wd/em-008/update/offline"
+    "will_message": "{}"
+  },
+  "wifi": {
+    "sta": {
+      "enable": true,
+      "gw": "",
+      "ip": "",
+      "netmask": "",
+      "pass": "hackmeifyoucan",
+      "ssid": "TOTO_2G"
+    },
+    "ap": {
+      "enable": true,
+      "keep_enabled": false
+    },
+    "rpc": {
+        "mqtt": {
+            "enable": false,
+            "is_trusted": true
+        }
+    }
+  }
+}
