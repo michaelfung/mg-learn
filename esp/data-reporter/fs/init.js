@@ -5,7 +5,6 @@ load('api_rpc.js');
 load('api_sys.js');
 load('api_mqtt.js');
 load('api_config.js');
-load('api_custom.js');
 
 // init variables / constants
 let wd_id = Cfg.get('device.id');
@@ -52,7 +51,7 @@ let update_state = function() {
 	});
 	let ok = MQTT.pub(topic, pubmsg);
 	//print('Published:', ok ? 'OK' : 'FAIL', 'topic:', topic, 'message:', pubmsg);
-	Custom.Log(LL.INFO, 'Published:'  + (ok ? 'OK' : 'FAIL') + ', topic:' + topic + ', msg:' +  pubmsg);
+	//Custom.Log(LL.INFO, 'Published:'  + (ok ? 'OK' : 'FAIL') + ', topic:' + topic + ', msg:' +  pubmsg);
 };
 
 /* toggle switch with bounce protection */
@@ -79,7 +78,7 @@ GPIO.set_button_handler(button_pin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 500, functi
 }, true);
 
 MQTT.sub('wd/' + wd_id + '/control', function(conn, topic, msg) {
-	Custom.Log(LL.INFO, 'rcvd ctrl msg:' + msg);
+	//Custom.Log(LL.INFO, 'rcvd ctrl msg:' + msg);
 	let parsed = JSON.parse(msg);
 
 	if ( parsed.op === 'read' ) {
@@ -110,11 +109,11 @@ MQTT.sub('wd/' + wd_id + '/control', function(conn, topic, msg) {
 	let pubmsg = JSON.stringify(parsed);
 	let ok = MQTT.pub(topic, pubmsg);
 	//print('Published:', ok ? 'OK' : 'FAIL', 'topic:', topic, 'message:', pubmsg);
-	Custom.Log(LL.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + 'topic:' + topic + 'msg:' +  pubmsg);
+	//Custom.Log(LL.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + 'topic:' + topic + 'msg:' +  pubmsg);
 	update_state();
 
 }, null);
 
 
-Custom.Log(LL.INFO, "### INIT Script Started ###");
+//Custom.Log(LL.INFO, "### INIT Script Started ###");
 

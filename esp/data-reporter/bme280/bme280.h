@@ -162,7 +162,7 @@
           uint16_t  read16_LE(byte reg); // little endian
           int16_t   readS16_LE(byte reg); // little endian
 
-          mgos_i2c *_i2c;
+          struct mgos_i2c *_i2c;
           uint8_t   _i2caddr;
           uint8_t   _protocol;
           int32_t   _sensorID;

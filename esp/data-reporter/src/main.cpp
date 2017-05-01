@@ -1,16 +1,17 @@
 #include <stdio.h>
-#include <time.h>
 
-#include "common/platform.h"
-#include "common/cs_file.h"
-#include "fw/src/mgos_app.h"
-#include "fw/src/mgos_gpio.h"
-#include "fw/src/mgos_sys_config.h"
-#include "fw/src/mgos_timers.h"
-#include "fw/src/mgos_hal.h"
-#include "fw/src/mgos_dlsym.h"
-#include "fw/src/mgos_mqtt.h"
-#include "mjs.h"
+extern "C" {
+	#include "common/platform.h"
+	#include "common/cs_file.h"
+	#include "fw/src/mgos_app.h"
+	#include "fw/src/mgos_gpio.h"
+	#include "fw/src/mgos_sys_config.h"
+	#include "fw/src/mgos_timers.h"
+	#include "fw/src/mgos_hal.h"
+	#include "fw/src/mgos_dlsym.h"
+	#include "fw/src/mgos_mqtt.h"
+	#include "mjs.h"
+}
 #include "bme280/bme280.h"
 
 Generic_BME280 bme;
@@ -22,13 +23,17 @@ int get_led_gpio_pin(void) {
   return ON_BOARD_LED;
 }
 
+/*
 void jslog(uint8_t level ,const char *msg) {
 	LOG(level, ("%s", msg));
 };
+*/
 
+/*
 int mqtt_connected(void) {
 	return (int) mqtt_conn_flag;
 }
+*/
 
 static void off_on_board_led_cb (void *arg) {
 	mgos_gpio_write(ON_BOARD_LED, 1);
@@ -105,7 +110,7 @@ enum mgos_app_init_result mgos_app_init(void) {
   bool status;
   status = bme.begin();
   if (!status) {
-    LOG (LL_INFO, ("Could not find BME280 on I2C, check wiring or I2C config"));
+    LOG (LL_ERROR, ("Could not find BME280 on I2C, check wiring or I2C config"));
   } else {
 	mgos_set_timer(5000, true /* repeat */, bme280_cb, NULL);
   }
