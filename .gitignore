@@ -31,3 +31,9 @@
 # Debug files
 *.dSYM/
 *.su
+
+# backup/temp folder
+backup/
+temp/
+tmp/
+
