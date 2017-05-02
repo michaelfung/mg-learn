@@ -5,6 +5,9 @@ load('api_rpc.js');
 load('api_sys.js');
 load('api_mqtt.js');
 load('api_config.js');
+load('api_custom.js');
+load('api_log.js');
+
 
 // init variables / constants
 let wd_id = Cfg.get('device.id');
@@ -45,13 +48,16 @@ let update_state = function() {
 		hub_id: wd_id,
 		ts: Sys.uptime(),
 		memory: Sys.free_ram(),
+		temp: Custom.BMETemp(),
+		humidity: Custom.BMEHumidity(),
+		pressure: Custom.BMEPressure(),
 		data: [
 			get_sw_state()
 		]
 	});
 	let ok = MQTT.pub(topic, pubmsg);
 	//print('Published:', ok ? 'OK' : 'FAIL', 'topic:', topic, 'message:', pubmsg);
-	//Custom.Log(LL.INFO, 'Published:'  + (ok ? 'OK' : 'FAIL') + ', topic:' + topic + ', msg:' +  pubmsg);
+	Log.print(Log.WARN, 'Published:'  + (ok ? 'OK' : 'FAIL') + ', topic:' + topic + ', msg:' +  pubmsg);
 };
 
 /* toggle switch with bounce protection */
@@ -109,11 +115,11 @@ MQTT.sub('wd/' + wd_id + '/control', function(conn, topic, msg) {
 	let pubmsg = JSON.stringify(parsed);
 	let ok = MQTT.pub(topic, pubmsg);
 	//print('Published:', ok ? 'OK' : 'FAIL', 'topic:', topic, 'message:', pubmsg);
-	//Custom.Log(LL.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + 'topic:' + topic + 'msg:' +  pubmsg);
+	Log.print(Log.WARN, 'Published:' + (ok ? 'OK' : 'FAIL') + 'topic:' + topic + 'msg:' +  pubmsg);
 	update_state();
 
 }, null);
 
 
-//Custom.Log(LL.INFO, "### INIT Script Started ###");
+Log.print(Log.WARN, "### INIT Script Started ###");
 

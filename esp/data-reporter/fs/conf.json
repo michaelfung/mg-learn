@@ -1,6 +1,6 @@
 {
   "debug": {
-    "level": 1,
+    "level": 3,
     "udp_log_addr": "192.168.0.1:514"
   },
   "device": {

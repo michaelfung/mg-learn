@@ -6,6 +6,7 @@ sources:
   - src
   - ${mjs_path}/mjs.c
   - bme280
+  - custom
 filesystem:
   - fs
   - ${mongoose_os_path}/fw/mjs_api/api_*.js

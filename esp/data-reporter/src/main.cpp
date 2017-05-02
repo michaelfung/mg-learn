@@ -11,29 +11,16 @@ extern "C" {
 	#include "fw/src/mgos_dlsym.h"
 	#include "fw/src/mgos_mqtt.h"
 	#include "mjs.h"
+	#include "custom/custom.h"
 }
 #include "bme280/bme280.h"
 
 Generic_BME280 bme;
 static int ON_BOARD_LED = 13; /* sonoff basic LED pin */
 
-bool mqtt_conn_flag = false;
-
 int get_led_gpio_pin(void) {
   return ON_BOARD_LED;
 }
-
-/*
-void jslog(uint8_t level ,const char *msg) {
-	LOG(level, ("%s", msg));
-};
-*/
-
-/*
-int mqtt_connected(void) {
-	return (int) mqtt_conn_flag;
-}
-*/
 
 static void off_on_board_led_cb (void *arg) {
 	mgos_gpio_write(ON_BOARD_LED, 1);
@@ -41,7 +28,7 @@ static void off_on_board_led_cb (void *arg) {
 }
 
 static void blink_on_board_led_cb(void *arg) {
-	if (mqtt_conn_flag) {
+	if (mqtt_conn_flag == 1) {
 		mgos_gpio_write(ON_BOARD_LED, 0);  // on
 		mgos_set_timer(50 /* ms */, false /* repeat */, off_on_board_led_cb, NULL);
 	} else {
@@ -66,23 +53,27 @@ static void mqtt_ev_handler(struct mg_connection *c, int ev, void *p, void *user
   struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
   if (ev == MG_EV_MQTT_CONNACK) {
     LOG(LL_INFO, ("CONNACK: %d", msg->connack_ret_code));
-    mqtt_conn_flag = true;
+    mqtt_conn_flag = 1;
     if (get_cfg()->mqtt.pub == NULL) {
       LOG(LL_ERROR, ("Run 'mos config-set mqtt.pub=... '"));
     } else {
       pub(c, "{timestamp:%.3lf, mem_free:%d}", mg_time(), mgos_get_free_heap_size() );  /* post uptime */
     }
   } else if (ev == MG_EV_CLOSE) {
-      mqtt_conn_flag = false;
+      mqtt_conn_flag = 0;
   }
   (void) user_data;
 }
 
 static void bme280_cb(void *arg){
+	bme_temp = bme.readTemperature();
+	bme_humidity = bme.readHumidity();
+	bme_pressure = (float)(bme.readPressure()/100);
+
   LOG (LL_INFO, ("Temp: %2.2fC, Humidity: %2.2f%%, Pressure: %2.4fmb",
-                 bme.readTemperature(),
-                 bme.readHumidity(),
-                 (float)(bme.readPressure()/100)));
+                 bme_temp,
+                 bme_humidity,
+                 bme_pressure));
   (void) arg;
 }
 
