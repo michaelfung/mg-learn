@@ -66,15 +66,17 @@ static void mqtt_ev_handler(struct mg_connection *c, int ev, void *p, void *user
 }
 
 static void bme280_cb(void *arg){
+	bme.takeForcedMeasurement();
 	bme_temp = bme.readTemperature();
 	bme_humidity = bme.readHumidity();
 	bme_pressure = (float)(bme.readPressure()/100);
 
-  LOG (LL_INFO, ("Temp: %2.2fC, Humidity: %2.2f%%, Pressure: %2.4fmb",
-                 bme_temp,
-                 bme_humidity,
-                 bme_pressure));
-  (void) arg;
+	LOG (LL_INFO, ("Temp: %2.2fC, Humidity: %2.2f%%, Pressure: %2.4fmb",
+		bme_temp,
+		bme_humidity,
+		bme_pressure)
+	);
+	(void) arg;
 }
 
 enum mgos_app_init_result mgos_app_init(void) {
@@ -103,7 +105,17 @@ enum mgos_app_init_result mgos_app_init(void) {
   if (!status) {
     LOG (LL_ERROR, ("Could not find BME280 on I2C, check wiring or I2C config"));
   } else {
-	mgos_set_timer(5000, true /* repeat */, bme280_cb, NULL);
+    /* set weather monitoring Scenario */
+    LOG (LL_INFO, ("-- Weather Station Scenario --"));
+    LOG (LL_INFO, ("forced mode, 1x temperature / 1x humidity / 1x pressure oversampling,"));
+    LOG (LL_INFO, ("filter off"));
+    bme.setSampling(Generic_BME280::MODE_FORCED,
+                    Generic_BME280::SAMPLING_X1, // temperature
+                    Generic_BME280::SAMPLING_X1, // pressure
+                    Generic_BME280::SAMPLING_X1, // humidity
+                    Generic_BME280::FILTER_OFF   );
+
+	mgos_set_timer(60000 /* 60 sec */, true /* repeat */, bme280_cb, NULL);
   }
 
   return MGOS_APP_INIT_SUCCESS;
