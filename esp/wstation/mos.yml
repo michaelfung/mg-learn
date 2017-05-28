@@ -1,7 +1,7 @@
 name: mjs_arduino_ssd1306
 # arch: PLATFORM
 version: 1.0
-skeleton_version: 2017-03-17
+skeleton_version: 2017-05-18
 modules:
   - origin: https://github.com/cesanta/mjs
   - origin: https://github.com/cesanta/arduino-drivers
@@ -11,15 +11,25 @@ sources:
   - ${arduino_drivers_path}/Arduino
   - ${arduino_drivers_path}/Adafruit_SSD1306
   - ${arduino_drivers_path}/Adafruit-GFX-Library
+  - ${arduino_drivers_path}/Adafruit_BME280
 filesystem:
   - fs
   - ${mjs_path}/mjs/lib/api_*.js
   - ${mongoose_os_path}/fw/mjs_api/api_*.js
   - ${mongoose_os_path}/fw/mjs_api/arduino_drivers/api_arduino_ssd1306.js
+  - ${mongoose_os_path}/fw/mjs_api/arduino_drivers/api_arduino_bme280.js
   - ${mongoose_os_path}/fw/platforms/${arch}/mjs_api/api_*.js
 config_schema:
   - ["i2c.enable", true]
   - ["i2c.sda_gpio", 5]
   - ["i2c.scl_gpio", 4]
+  - ["wifi.sta.ssid", "TOTO_2G"]
+  - ["wifi.sta.pass", "hackmeifyoucan"]
+  - ["wifi.sta.enable", true]
+  - ["wifi.ap.keep_enabled", false]
 build_vars:
+  MGOS_ENABLE_MQTT: 1
   MGOS_ENABLE_ARDUINO_API: 1
+  SSL: mbedTLS
+  MGOS_ENABLE_ONEWIRE: 1
+
