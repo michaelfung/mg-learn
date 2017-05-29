@@ -20,6 +20,7 @@ filesystem:
   - ${mongoose_os_path}/fw/mjs_api/arduino_drivers/api_arduino_bme280.js
   - ${mongoose_os_path}/fw/platforms/${arch}/mjs_api/api_*.js
 config_schema:
+  - ["device.id", "SetupWSTA_??????"]
   - ["i2c.enable", true]
   - ["i2c.sda_gpio", 5]
   - ["i2c.scl_gpio", 4]
