@@ -7,9 +7,11 @@
  */
 
 // Load Mongoose OS API
+load('api_log.js');
 load('api_timer.js');
 load('api_arduino_ssd1306.js');
 load('api_arduino_bme280.js');
+
 
 // Initialize Adafruit_SSD1306 library (I2C)
 let d = Adafruit_SSD1306.create_i2c(4 /* RST GPIO */, Adafruit_SSD1306.RES_128_64);
@@ -26,7 +28,7 @@ let sens_addr = 0x76;
 let bme = Adafruit_BME280.create();
 // Initialize the sensor
 if (bme.begin(sens_addr) === 0) {
-  print('Cant find a sensor');
+  Log.print(Log.ERROR, 'Cant find a sensor!');
 } else {
   has_bme = true;
 }
@@ -41,10 +43,10 @@ Timer.set(5000 /* milliseconds */, true /* repeat */, function() {
 		temp = bme.readTemperature();
 		humid = bme.readHumidity();
 		pressure = bme.readPressure();
-		    print('Humidity:', humid, '%RH');
-    print('Pressure:',pressure, 'hPa');
-		print('Temperature:', temp, '*C');
-	  //showStr(d, "T: " + JSON.stringify(temp) + '*C');
+		Log.print(Log.INFO, 'Temperature:' + JSON.stringify(temp) + '*C');
+		Log.print(Log.INFO, 'Humidity:' + JSON.stringify(humid) + '%');
+    Log.print(Log.INFO, 'Pressure:' + JSON.stringify(pressure) + 'hPa');
+
 	  d.setTextSize(2);
 	 d.setCursor(0, 0);
     d.write(JSON.stringify(temp) + ' *C');
@@ -52,7 +54,7 @@ Timer.set(5000 /* milliseconds */, true /* repeat */, function() {
      d.setCursor(0, 32);
     d.write("H: " + JSON.stringify(humid) + '%');
      d.setCursor(0, 48);
-    d.write("P: " + JSON.stringify(pressure) + 'hPa');
+    d.write("P: " + JSON.stringify(pressure) + ' hPa');
 
     d.display();
 	}
