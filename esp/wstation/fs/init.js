@@ -9,9 +9,14 @@
 // Load Mongoose OS API
 load('api_log.js');
 load('api_timer.js');
+load('api_gpio.js');
+load('api_sys.js');
 load('api_arduino_ssd1306.js');
 load('api_arduino_bme280.js');
 
+let pir_pin = 13;
+
+GPIO.set_mode(pir_pin, GPIO.MODE_INPUT);
 
 // Initialize Adafruit_SSD1306 library (I2C)
 let d = Adafruit_SSD1306.create_i2c(4 /* RST GPIO */, Adafruit_SSD1306.RES_128_64);
@@ -50,13 +55,16 @@ Timer.set(5000 /* milliseconds */, true /* repeat */, function() {
 	  d.setTextSize(2);
 	 d.setCursor(0, 0);
     d.write(JSON.stringify(temp) + ' *C');
-    d.setTextSize(1);
-     d.setCursor(0, 32);
+     d.setCursor(0, 16);
     d.write("H: " + JSON.stringify(humid) + '%');
-     d.setCursor(0, 48);
+     d.setCursor(0, 32);
     d.write("P: " + JSON.stringify(pressure) + ' hPa');
 
     d.display();
 	}
+}, null);
+
+GPIO.set_button_handler(pir_pin, GPIO.PULL_DOWN, GPIO.INT_EDGE_POS, 500, function(x) {
+  Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
 }, null);
 
