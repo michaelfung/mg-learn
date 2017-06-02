@@ -13,8 +13,11 @@ load('api_gpio.js');
 load('api_sys.js');
 load('api_arduino_ssd1306.js');
 load('api_arduino_bme280.js');
+load('api_http.js');
 
 let pir_pin = 13;
+let ThingSpeakKey = 'RDW7QK8IE5NON9KJ';
+let motion_count = 0;
 
 GPIO.set_mode(pir_pin, GPIO.MODE_INPUT);
 
@@ -42,29 +45,48 @@ let temp = -273.0;
 let humid = 0.0;
 let pressure = 0.0;
 
-Timer.set(5000 /* milliseconds */, true /* repeat */, function() {
-	if (has_bme) {
-	  d.clearDisplay();
-		temp = bme.readTemperature();
-		humid = bme.readHumidity();
-		pressure = bme.readPressure();
-		Log.print(Log.INFO, 'Temperature:' + JSON.stringify(temp) + '*C');
-		Log.print(Log.INFO, 'Humidity:' + JSON.stringify(humid) + '%');
-    Log.print(Log.INFO, 'Pressure:' + JSON.stringify(pressure) + 'hPa');
+let UpdateReadings = function() {
+    if (has_bme) {
+        d.clearDisplay();
+        temp = bme.readTemperature();
+        humid = bme.readHumidity();
+        pressure = bme.readPressure();
+        Log.print(Log.INFO, 'Temperature:' + JSON.stringify(temp) + '*C');
+        Log.print(Log.INFO, 'Humidity:' + JSON.stringify(humid) + '%');
+        Log.print(Log.INFO, 'Pressure:' + JSON.stringify(pressure) + 'hPa');
 
-	  d.setTextSize(2);
-	 d.setCursor(0, 0);
-    d.write(JSON.stringify(temp) + ' *C');
-     d.setCursor(0, 16);
-    d.write("H: " + JSON.stringify(humid) + '%');
-     d.setCursor(0, 32);
-    d.write("P: " + JSON.stringify(pressure) + ' hPa');
+        d.setTextSize(2);
+        d.setCursor(0, 0);
+        d.write(JSON.stringify(temp) + ' *C');
+        d.setCursor(0, 16);
+        d.write("H: " + JSON.stringify(humid) + '%');
+        d.setCursor(0, 32);
+        d.write("P: " + JSON.stringify(pressure) + ' hPa');
 
-    d.display();
-	}
+        d.display();
+
+        HTTP.query({
+            url: 'http://api.thingspeak.com/update?api_key=' + ThingSpeakKey + '&field1=' + JSON.stringify(temp) + '&field2=' + JSON.stringify(humid) + '&field3=' + JSON.stringify(pressure) + '&field4=' + JSON.stringify(motion_count),
+            success: function(body, full_http_msg) { print('HTTP OK:', body); },
+            error: function(err) { print('HTTP ERR:', err); },  // Optional
+        });
+    }
+};
+
+// wait 5 seconds after boot and give initial readings
+Timer.set(5000 /* milliseconds */, false /* repeat */, function() {
+    UpdateReadings();
+}, null);
+
+// update readings every n seconds
+Timer.set(120000 /* milliseconds */, true /* repeat */, function() {
+    UpdateReadings();
+    motion_count = 0;
 }, null);
 
 GPIO.set_button_handler(pir_pin, GPIO.PULL_DOWN, GPIO.INT_EDGE_POS, 500, function(x) {
   Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
+  motion_count++;
 }, null);
+
 
