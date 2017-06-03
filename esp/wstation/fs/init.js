@@ -5,7 +5,6 @@
  * This example demonstrates how to use mJS Arduino Adafruit_SSD1306
  * library API.
  */
-
 // Load Mongoose OS API
 load('api_log.js');
 load('api_timer.js');
@@ -22,9 +21,9 @@ let motion_count = 0;
 GPIO.set_mode(pir_pin, GPIO.MODE_INPUT);
 
 // Initialize Adafruit_SSD1306 library (I2C)
-let d = Adafruit_SSD1306.create_i2c(4 /* RST GPIO */, Adafruit_SSD1306.RES_128_64);
+let d = Adafruit_SSD1306.create_i2c(4 /* RST GPIO */ , Adafruit_SSD1306.RES_128_64);
 // Initialize the display.
-d.begin(Adafruit_SSD1306.SWITCHCAPVCC, 0x3C, true /* reset */);
+d.begin(Adafruit_SSD1306.SWITCHCAPVCC, 0x3C, true /* reset */ );
 d.display();
 //d.setTextSize(1);
 d.setTextColor(Adafruit_SSD1306.WHITE);
@@ -36,9 +35,9 @@ let sens_addr = 0x76;
 let bme = Adafruit_BME280.create();
 // Initialize the sensor
 if (bme.begin(sens_addr) === 0) {
-  Log.print(Log.ERROR, 'Cant find a sensor!');
+    Log.print(Log.ERROR, 'Cant find a sensor!');
 } else {
-  has_bme = true;
+    has_bme = true;
 }
 
 let temp = -273.0;
@@ -67,26 +66,28 @@ let UpdateReadings = function() {
 
         HTTP.query({
             url: 'http://api.thingspeak.com/update?api_key=' + ThingSpeakKey + '&field1=' + JSON.stringify(temp) + '&field2=' + JSON.stringify(humid) + '&field3=' + JSON.stringify(pressure) + '&field4=' + JSON.stringify(motion_count),
-            success: function(body, full_http_msg) { print('HTTP OK:', body); },
-            error: function(err) { print('HTTP ERR:', err); },  // Optional
+            success: function(body, full_http_msg) {
+                print('HTTP OK:', body);
+            },
+            error: function(err) {
+                print('HTTP ERR:', err);
+            }, // Optional
         });
     }
 };
 
 // wait 5 seconds after boot and give initial readings
-Timer.set(5000 /* milliseconds */, false /* repeat */, function() {
+Timer.set(5000 /* milliseconds */ , false /* repeat */ , function() {
     UpdateReadings();
 }, null);
 
 // update readings every n seconds
-Timer.set(120000 /* milliseconds */, true /* repeat */, function() {
+Timer.set(300000 /* milliseconds */ , true /* repeat */ , function() {
     UpdateReadings();
     motion_count = 0;
 }, null);
 
 GPIO.set_button_handler(pir_pin, GPIO.PULL_DOWN, GPIO.INT_EDGE_POS, 500, function(x) {
-  Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
-  motion_count++;
+    Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
+    motion_count++;
 }, null);
-
-
