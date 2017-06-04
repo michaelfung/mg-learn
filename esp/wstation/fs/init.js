@@ -67,10 +67,10 @@ let UpdateReadings = function() {
         HTTP.query({
             url: 'http://api.thingspeak.com/update?api_key=' + ThingSpeakKey + '&field1=' + JSON.stringify(temp) + '&field2=' + JSON.stringify(humid) + '&field3=' + JSON.stringify(pressure) + '&field4=' + JSON.stringify(motion_count),
             success: function(body, full_http_msg) {
-                print('HTTP OK:', body);
+                Log.print(Log.INFO, 'ThingSpeak Feed OK:' + body);
             },
             error: function(err) {
-                print('HTTP ERR:', err);
+                Log.print(Log.ERROR, 'ThingSpeak Feed ERR:' + err);
             }, // Optional
         });
     }
@@ -81,13 +81,36 @@ Timer.set(5000 /* milliseconds */ , false /* repeat */ , function() {
     UpdateReadings();
 }, null);
 
-// update readings every n seconds
-Timer.set(300000 /* milliseconds */ , true /* repeat */ , function() {
+let TickCount = 0;
+Timer.set(5000 /* milliseconds */ , true /* repeat */ , function() {
+	TickCount++;
+
+	// update readings every 300 seconds
+	if ((TickCount % (300 / 5)) === 0) {
+		UpdateReadings();
+		motion_count = 0;
+		TickCount = 0;
+	}
+
+	// check pir level
+	if (GPIO.read(pir_pin) === 1) {
+		Log.print(Log.INFO, '### PIR sensor active ###');
+		motion_count++;
+	}
+}, null);
+
+
+GPIO.set_int_handler(pir_pin, GPIO.INT_EDGE_POS, function(x) {
+    Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
+    motion_count++;
+}, null);
+GPIO.enable_int(pir_pin);
+
+// press gpio 0 to force readings update
+GPIO.set_button_handler(0, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 500, function(x) {
     UpdateReadings();
     motion_count = 0;
 }, null);
 
-GPIO.set_button_handler(pir_pin, GPIO.PULL_DOWN, GPIO.INT_EDGE_POS, 500, function(x) {
-    Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
-    motion_count++;
-}, null);
+
+
