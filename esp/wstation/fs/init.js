@@ -65,7 +65,7 @@ let UpdateReadings = function() {
         d.display();
 
         HTTP.query({
-            url: 'http://api.thingspeak.com/update?api_key=' + ThingSpeakKey + '&field1=' + JSON.stringify(temp) + '&field2=' + JSON.stringify(humid) + '&field3=' + JSON.stringify(pressure) + '&field4=' + JSON.stringify(motion_count),
+            url: 'http://api.thingspeak.com/update?api_key=' + ThingSpeakKey + '&field1=' + JSON.stringify(temp) + '&field2=' + JSON.stringify(humid) + '&field3=' + JSON.stringify(pressure) + '&field4=' + JSON.stringify(motion_count) + '&field5=' + JSON.stringify(Sys.free_ram()),
             success: function(body, full_http_msg) {
                 Log.print(Log.INFO, 'ThingSpeak Feed OK:' + body);
             },
