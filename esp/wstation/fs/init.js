@@ -53,6 +53,8 @@ let UpdateReadings = function() {
         Log.print(Log.INFO, 'Temperature:' + JSON.stringify(temp) + '*C');
         Log.print(Log.INFO, 'Humidity:' + JSON.stringify(humid) + '%');
         Log.print(Log.INFO, 'Pressure:' + JSON.stringify(pressure) + 'hPa');
+        Log.print(Log.INFO, 'Activities:' + JSON.stringify(motion_count));
+        Log.print(Log.INFO, 'RAM:' + JSON.stringify(Sys.free_ram()));
 
         d.setTextSize(2);
         d.setCursor(0, 0);
@@ -74,6 +76,7 @@ let UpdateReadings = function() {
             }, // Optional
         });
     }
+    motion_count = 0;
 };
 
 // wait 5 seconds after boot and give initial readings
@@ -88,7 +91,6 @@ Timer.set(5000 /* milliseconds */ , true /* repeat */ , function() {
 	// update readings every 300 seconds
 	if ((TickCount % (300 / 5)) === 0) {
 		UpdateReadings();
-		motion_count = 0;
 		TickCount = 0;
 	}
 
@@ -109,7 +111,6 @@ GPIO.enable_int(pir_pin);
 // press gpio 0 to force readings update
 GPIO.set_button_handler(0, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 500, function(x) {
     UpdateReadings();
-    motion_count = 0;
 }, null);
 
 
