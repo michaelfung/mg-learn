@@ -4,6 +4,7 @@
 
 // Load Mongoose OS API
 load('api_log.js');
+load('api_config.js');
 load('api_timer.js');
 load('api_gpio.js');
 load('api_sys.js');
@@ -13,7 +14,7 @@ load('api_http.js');
 
 /* vars declare */
 let pir_pin = 13;
-let ThingSpeakKey = 'RDW7QK8IE5NON9KJ';
+let ThingSpeakKey = Cfg.get('thingspeak.key') || '__BADKEY__';  // 'RDW7QK8IE5NON9KJ';
 let motion_count = 0;
 // let last_motion_ts = 0;  // use if need high inactive precision
 let inactive_duration = 0;  // no motion detected for n ms
@@ -108,7 +109,7 @@ Timer.set(read_interval , true, function() {
     }
 
     // check pir level
-    if (GPIO.read(pir_pin) === 1) {
+    if (inactive_duration === -1) {
         Log.print(Log.INFO, '### PIR sensor active ###');
         motion_count++;
     } else {
@@ -116,10 +117,13 @@ Timer.set(read_interval , true, function() {
     }
 }, null);
 
-
 GPIO.set_int_handler(pir_pin, GPIO.INT_EDGE_POS, function(x) {
     Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
     motion_count++;
+    inactive_duration = -1;
+}, null);
+GPIO.set_int_handler(pir_pin, GPIO.INT_EDGE_NEG, function(x) {
+    Log.print(Log.INFO, 'vvv PIR sensor deactivated vvv');
     inactive_duration = 0;
 }, null);
 GPIO.enable_int(pir_pin);

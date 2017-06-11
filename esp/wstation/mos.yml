@@ -26,6 +26,8 @@ config_schema:
   - ["wifi.sta.pass", "hackmeifyoucan"]
   - ["wifi.sta.enable", true]
   - ["wifi.ap.keep_enabled", false]
+  - ["thingspeak", "o", {title: "ThingSpeak config"} ]
+  - ["thingspeak.key", "s", "", {title: "ThingSpeak API Key"} ]
 build_vars:
   MGOS_ENABLE_MQTT: 1
   MGOS_ENABLE_ARDUINO_API: 1
