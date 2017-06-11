@@ -72,13 +72,15 @@ let UpdateReadings = function() {
         }
 
         HTTP.query({
-            url: 'https://api.thingspeak.com/update?api_key='
+            url: 'http://api.thingspeak.com/update?api_key='
             + ThingSpeakKey + '&field1=' + JSON.stringify(temp)
             + '&field2=' + JSON.stringify(humid)
             + '&field3=' + JSON.stringify(pressure)
             + '&field4=' + JSON.stringify(motion_count)
-            + '&field5=' + JSON.stringify(Sys.free_ram()),
-            ca_cert: 'thingspeak_ca.pem',
+            + '&field5=' + JSON.stringify(Sys.free_ram())
+            + '&field6=' + JSON.stringify(inactive_duration / 1000),
+
+            /* ca_cert: 'thingspeak_ca.pem', */
             success: function(body, full_http_msg) {
                 Log.print(Log.INFO, 'ThingSpeak Feed OK:' + body);
             },
@@ -109,7 +111,7 @@ Timer.set(read_interval , true, function() {
     if (GPIO.read(pir_pin) === 1) {
         Log.print(Log.INFO, '### PIR sensor active ###');
         motion_count++;
-    } else if (motion_count === 0) {
+    } else {
         inactive_duration = inactive_duration + read_interval;
     }
 }, null);
