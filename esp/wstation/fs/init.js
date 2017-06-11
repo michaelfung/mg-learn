@@ -109,7 +109,7 @@ Timer.set(read_interval , true, function() {
     }
 
     // check pir level
-    if (inactive_duration === -1) {
+    if (GPIO.read(pir_pin) === 1) {
         Log.print(Log.INFO, '### PIR sensor active ###');
         motion_count++;
     } else {
@@ -120,10 +120,6 @@ Timer.set(read_interval , true, function() {
 GPIO.set_int_handler(pir_pin, GPIO.INT_EDGE_POS, function(x) {
     Log.print(Log.INFO, '^^^ PIR sensor triggered ^^^');
     motion_count++;
-    inactive_duration = -1;
-}, null);
-GPIO.set_int_handler(pir_pin, GPIO.INT_EDGE_NEG, function(x) {
-    Log.print(Log.INFO, 'vvv PIR sensor deactivated vvv');
     inactive_duration = 0;
 }, null);
 GPIO.enable_int(pir_pin);
