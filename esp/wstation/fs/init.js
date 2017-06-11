@@ -14,7 +14,7 @@ load('api_http.js');
 
 /* vars declare */
 let pir_pin = 13;
-let ThingSpeakKey = Cfg.get('thingspeak.key') || '__BADKEY__';  // 'RDW7QK8IE5NON9KJ';
+let ThingSpeakKey = Cfg.get('thingspeak.key');
 let motion_count = 0;
 // let last_motion_ts = 0;  // use if need high inactive precision
 let inactive_duration = 0;  // no motion detected for n ms
