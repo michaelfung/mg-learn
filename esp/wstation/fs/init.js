@@ -11,6 +11,7 @@ load('api_sys.js');
 load('api_arduino_ssd1306.js');
 load('api_arduino_bme280.js');
 load('api_http.js');
+load('api_math.js');
 
 /* vars declare */
 let pir_pin = 13;
@@ -26,6 +27,8 @@ let read_interval = 5000;  // read sensors every n ms
 let tickcount = 0;  // for periodic reading
 let tick_300s = 300000 / read_interval;  // ticks per 5 mins
 let display_enabled = true;
+let localts= 0;
+let hour = 0;
 
 /* hardware setup */
 GPIO.set_mode(pir_pin, GPIO.MODE_INPUT);
@@ -51,8 +54,9 @@ let UpdateReadings = function() {
     if (has_bme) {
 
         temp = bme.readTemperature();
-        humid = bme.readHumidity();
-        pressure = bme.readPressure();
+        humid = Math.floor(bme.readHumidity());
+        pressure = Math.floor(bme.readPressure());
+
         Log.print(Log.INFO, 'Temperature:' + JSON.stringify(temp) + '*C');
         Log.print(Log.INFO, 'Humidity:' + JSON.stringify(humid) + '%');
         Log.print(Log.INFO, 'Pressure:' + JSON.stringify(pressure) + 'hPa');
@@ -69,6 +73,9 @@ let UpdateReadings = function() {
             d.write("H: " + JSON.stringify(humid) + '%');
             d.setCursor(0, 32);
             d.write("P: " + JSON.stringify(pressure) + ' hPa');
+            d.display();
+        } else {
+            d.clearDisplay();
             d.display();
         }
 
@@ -102,8 +109,18 @@ Timer.set(5000 /* milliseconds */ , false /* repeat */ , function() {
 Timer.set(read_interval , true, function() {
     tickcount++;
 
+
     // update readings every 300 seconds
     if ((tickcount % (tick_300s)) === 0) {
+
+		localts = Math.floor(Timer.now()) + 28800  /* HKT (8 x 3600s) */;
+		hour = localts % 86400;
+		if ( (hour > (6 * 3600)) || (hour < (22 * 3600))) {
+			display_enabled = true;
+		} else {
+			display_enabled = false;
+		}
+
         UpdateReadings();
         tickcount = 0;
     }

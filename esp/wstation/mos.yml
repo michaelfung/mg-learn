@@ -1,18 +1,26 @@
-name: w_station
+name: weather_station
 # arch: PLATFORM
-version: 1.0
+version: 1.2
 skeleton_version: 2017-05-18
 sources:
   - src
 filesystem:
   - fs
 libs:
-  - origin: https://github.com/mongoose-os-libs/mjs
+    # common mgos libs
+  - origin: https://github.com/mongoose-os-libs/ota-http-server
+  - origin: https://github.com/mongoose-os-libs/rpc-loopback
   - origin: https://github.com/mongoose-os-libs/rpc-mqtt
   - origin: https://github.com/mongoose-os-libs/rpc-service-config
   - origin: https://github.com/mongoose-os-libs/rpc-service-fs
+  - origin: https://github.com/mongoose-os-libs/rpc-service-gpio
   - origin: https://github.com/mongoose-os-libs/rpc-service-i2c
-  - origin: https://github.com/mongoose-os-libs/updater-rpc
+  - origin: https://github.com/mongoose-os-libs/rpc-service-ota
+  - origin: https://github.com/mongoose-os-libs/rpc-uart
+  - origin: https://github.com/mongoose-os-libs/vfs-dev-spi-flash
+    # libs necessary for the current app
+  # - origin: https://github.com/mongoose-os-libs/aws
+  - origin: https://github.com/mongoose-os-libs/mjs
   - origin: https://github.com/mongoose-os-libs/arduino-wire
   - origin: https://github.com/mongoose-os-libs/arduino-adafruit-ssd1306
   - origin: https://github.com/mongoose-os-libs/arduino-adafruit-gfx
@@ -28,11 +36,9 @@ config_schema:
   - ["wifi.sta.enable", true]
   - ["wifi.ap.keep_enabled", false]
   - ["thingspeak", "o", {title: "ThingSpeak config"} ]
-  - ["thingspeak.key", "s", "", {title: "ThingSpeak API Key"} ]
+  - ["thingspeak.key", "s", "key_to_be_set", {title: "ThingSpeak API Key"} ]
 build_vars:
-  MGOS_ENABLE_MQTT: 1
   MGOS_ENABLE_ARDUINO_API: 1
   SSL: mbedTLS
-  MGOS_ENABLE_SNTP: 0
   FS_SIZE: 196608
 
