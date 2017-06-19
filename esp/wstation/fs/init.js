@@ -109,17 +109,16 @@ Timer.set(5000 /* milliseconds */ , false /* repeat */ , function() {
 Timer.set(read_interval , true, function() {
     tickcount++;
 
-
     // update readings every 300 seconds
     if ((tickcount % (tick_300s)) === 0) {
 
-		localts = Math.floor(Timer.now()) + 28800  /* HKT (8 x 3600s) */;
-		hour = localts % 86400;
-		if ( (hour > (6 * 3600)) || (hour < (22 * 3600))) {
-			display_enabled = true;
-		} else {
-			display_enabled = false;
-		}
+        localts = Math.floor(Timer.now()) + 28800  /* HKT (8 x 3600s) */;
+        hour = localts % 86400;
+        if ( (hour > (6 * 3600)) && (hour < (22 * 3600))) {
+            display_enabled = true;
+        } else {
+            display_enabled = false;
+        }
 
         UpdateReadings();
         tickcount = 0;
@@ -143,5 +142,6 @@ GPIO.enable_int(pir_pin);
 
 // press gpio 0 to force readings update
 GPIO.set_button_handler(0, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 500, function(x) {
+    display_enabled = true;
     UpdateReadings();
 }, null);
