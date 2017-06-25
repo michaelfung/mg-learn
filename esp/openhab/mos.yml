@@ -28,5 +28,17 @@ libs:
     # libs necessary for the current app
   #- origin: https://github.com/mongoose-os-libs/aws
   - origin: https://github.com/mongoose-os-libs/mjs
+config_schema:
+  - ["debug.level", 3]
+  - ["device.id", "HabTest"]
+  - ["i2c.enable", false]
+  - ["wifi.sta.ssid", "TOTO_2G"]
+  - ["wifi.sta.pass", "hackmeifyoucan"]
+  - ["wifi.sta.enable", true]
+  - ["wifi.ap.keep_enabled", false]
+  - ["mqtt.enable", true]
+  - ["mqtt.server", "hab2.lan:1883"]
+  - ["mqtt.client_id", "habtest-01"]
 build_vars:
+  FS_SIZE: 196608
   # MGOS_ENABLE_ONEWIRE: 1
