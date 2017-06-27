@@ -17,13 +17,15 @@ load('api_log.js');
 // init variables / constants
 let thing_id = Cfg.get('mqtt.client_id');
 let hab_control_topic = 'hab2/switch/' + thing_id;
+let hab_state_topic = 'hab2/switch/' + thing_id + '/state';
 let led_onboard = 13; // Sonoff LED pin
 let sw_pin = 12;  // Sonoff relay pin
 let spare_pin = 14;  // Sonoff not connected
 let button_pin = 0;  // Sonoff push button
 let sw_state = {
-    dev_id: '00FF0001',
-    status: 0,
+    dev_id: '1',
+    value: 0,
+    status: 'OFF',
     battery: 1,
     time: 0
 };
@@ -42,31 +44,29 @@ GPIO.set_mode(button_pin, GPIO.MODE_INPUT);
 // define functions:
 let get_sw_state = function() {
     sw_state.time = Timer.now();
+    sw_state.status = sw_state.value ? 'ON' : 'OFF';
     return sw_state;
 };
 
 /* notify server of switch state */
 let update_state = function() {
-    let topic = 'wd/' + thing_id + '/update/state';
     let pubmsg = JSON.stringify({
-        type: 'noti',
-        op: 'report',
-        hub_id: thing_id,
+        op: 'state',
         uptime: Sys.uptime(),
         memory: Sys.free_ram(),
         data: [
             get_sw_state()
         ]
     });
-    let ok = MQTT.pub(topic, pubmsg);
-    Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + topic + 'msg:' +  pubmsg);
+    let ok = MQTT.pub(hab_state_topic, pubmsg);
+    Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + hab_state_topic + 'msg:' +  pubmsg);
 };
 
 /* toggle switch with bounce protection */
 let toggle_switch = function() {
     if ( (Sys.uptime() - last_toggle ) > 10 ) {
         GPIO.toggle(sw_pin);
-        sw_state.status = 1 - sw_state.status; // 0 1 toggle
+        sw_state.value = 1 - sw_state.value; // 0 1 toggle
         last_toggle = Sys.uptime();
     } else {
         Log.print(Log.INFO, 'Too frequent. Toggle not allowed.');
@@ -90,12 +90,12 @@ MQTT.sub(hab_control_topic, function(conn, topic, msg) {
         if ( parsed.value === 1 ) {
             if ( (Sys.uptime() - last_toggle ) > 5 ) {
                 GPIO.write(sw_pin, 1);  // set switch to on
-                sw_state.status = 1;
+                sw_state.value = 1;
                 last_toggle = Sys.uptime();
             }
         } else if ( parsed.value === 0 ) {
                    GPIO.write(sw_pin, 0);  // set switch to off
-                   sw_state.status = 0;
+                   sw_state.value = 0;
                    last_toggle = Sys.uptime();
         } else {
                 //parsed.errno = 5;  /* 5: invalid param */
@@ -111,7 +111,7 @@ MQTT.sub(hab_control_topic, function(conn, topic, msg) {
     //let pubmsg = JSON.stringify(parsed);
     //let ok = MQTT.pub(topic, pubmsg);
     //Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + topic + 'msg:' +  pubmsg);
-    // update_state();
+    update_state();
 
 }, null);
 

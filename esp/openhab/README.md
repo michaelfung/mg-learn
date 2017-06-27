@@ -29,17 +29,21 @@ sitemap default label="My first sitemap"
 
 #### JSON command
 
-If want to use JSON in control command, create a map file habtest1.map:
+If want to use JSON in control command and status report:
+
+1. Make sure installed the **MAP** and **JSONPath** Transformation Add-On.
+
+2. create a map file habtest1.map:
 
 ```
 ON={"op": "set", "value": 1}
 OFF={"op": "set", "value": 0}
 ```
 
-Make sure installed the **MAP Transformation** Add-On.
+Then, define item as:
 
 ```
-Switch HabTest1 {mqtt=">[broker:hab2/switch/habtest1:command:*:MAP(habtest1.map)], <[broker:hab2/switch/habtest1:state:ON:1],<[broker:hab2/switch/habtest1:state:OFF:0]"}
+Switch HabTest1 {mqtt=">[local_broker:hab2/switch/habtest1:command:*:MAP(habtest1.map)], <[local_broker:hab2/switch/habtest1/state:state:JSONPATH($.data[0].status)]"}
 ```
 
 
