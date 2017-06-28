@@ -43,9 +43,22 @@ OFF={"op": "set", "value": 0}
 Then, define item as:
 
 ```
-Switch HabTest1 {mqtt=">[local_broker:hab2/switch/habtest1:command:*:MAP(habtest1.map)], <[local_broker:hab2/switch/habtest1/state:state:JSONPATH($.data[0].status)]"}
+Switch HabTest1_Switch "Lights Switch" {mqtt=">[local_broker:hab2/switch/habtest1:command:*:MAP(habtest1.map)], <[local_broker:hab2/switch/habtest1/state:state:JSONPATH($.data[0].status)]"}
+Number HabTest1_RAM "RAM Free" {mqtt="<[local_broker:hab2/switch/habtest1/state:state:JSONPATH($.memory)]"}
+
 ```
 
+And sitemap as:
+
+```
+sitemap default label="My first sitemap"
+{
+    Switch item=Presence_Mobile_Michael label="Michael Mobile"
+    Switch item=HabTest1_Switch label="HabTest1 Lights Switch"
+    Text item=HabTest1_RAM label="HabTest1 RAM Free [%d bytes]" icon="line-stagnation"
+}
+
+```
 
 #### Clear config cache
 

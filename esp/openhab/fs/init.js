@@ -30,6 +30,7 @@ let sw_state = {
     time: 0
 };
 let last_toggle = 0;
+let tick_count = 0;
 
 // init hardware
 GPIO.set_mode(led_onboard, GPIO.MODE_OUTPUT);
@@ -59,7 +60,7 @@ let update_state = function() {
         ]
     });
     let ok = MQTT.pub(hab_state_topic, pubmsg);
-    Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + hab_state_topic + 'msg:' +  pubmsg);
+    Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + hab_state_topic + ' msg:' +  pubmsg);
 };
 
 /* toggle switch with bounce protection */
@@ -88,7 +89,7 @@ MQTT.sub(hab_control_topic, function(conn, topic, msg) {
 
     if ( parsed.op === 'set' ) {
         if ( parsed.value === 1 ) {
-            if ( (Sys.uptime() - last_toggle ) > 5 ) {
+            if ( (Sys.uptime() - last_toggle ) > 2 ) {
                 GPIO.write(sw_pin, 1);  // set switch to on
                 sw_state.value = 1;
                 last_toggle = Sys.uptime();
@@ -107,46 +108,21 @@ MQTT.sub(hab_control_topic, function(conn, topic, msg) {
         Log.print(Log.ERROR, 'Unsupported Operation');
     }
 
-    //let topic = 'wd/' + thing_id + '/update/state';
-    //let pubmsg = JSON.stringify(parsed);
-    //let ok = MQTT.pub(topic, pubmsg);
-    //Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + topic + 'msg:' +  pubmsg);
     update_state();
 
 }, null);
 
-//MQTT.sub(hab_control_topic, function(conn, topic, msg) {
-    //Log.print(Log.INFO, 'rcvd ctrl msg:' + msg);
-
-    //if ( msg === '1' ) {
-        //if ( (Sys.uptime() - last_toggle ) > 5 ) {
-            //GPIO.write(sw_pin, 1);  // set switch to on
-            //sw_state.status = 1;
-            //last_toggle = Sys.uptime();
-        //}
-    //} else if ( msg === '0') {
-           //GPIO.write(sw_pin, 0);  // set switch to off
-           //sw_state.status = 0;
-           //last_toggle = Sys.uptime();
-    //} else {
-        ////parsed.errno = 5;  /* 5: invalid param */
-        //Log.print(Log.ERROR, 'Unknown Operation');
-    //}
-
-    ////let topic = 'wd/' + thing_id + '/update/state';
-    ////let pubmsg = JSON.stringify(parsed);
-    ////let ok = MQTT.pub(topic, pubmsg);
-    ////Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + topic + 'msg:' +  pubmsg);
-    //// update_state();
-
-//}, null);
-
 
 // Blink built-in LED every second
-GPIO.set_mode(led_onboard, GPIO.MODE_OUTPUT);
 Timer.set(1000 /* 1 sec */, true /* repeat */, function() {
+
   let value = GPIO.toggle(led_onboard);
   print(value ? 'Tick' : 'Tock', 'uptime:', Sys.uptime());
+  tick_count++;
+  tick_count = tick_count % 10;
+  if ( tick_count === 0 ) {
+		update_state();
+  }
 }, null);
 
 Log.print(Log.WARN, "### init script started ###");
