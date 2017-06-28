@@ -65,7 +65,7 @@ let update_state = function() {
 
 /* toggle switch with bounce protection */
 let toggle_switch = function() {
-    if ( (Sys.uptime() - last_toggle ) > 10 ) {
+    if ( (Sys.uptime() - last_toggle ) > 2 ) {
         GPIO.toggle(sw_pin);
         sw_state.value = 1 - sw_state.value; // 0 1 toggle
         last_toggle = Sys.uptime();
@@ -119,7 +119,7 @@ Timer.set(1000 /* 1 sec */, true /* repeat */, function() {
   let value = GPIO.toggle(led_onboard);
   print(value ? 'Tick' : 'Tock', 'uptime:', Sys.uptime());
   tick_count++;
-  tick_count = tick_count % 10;
+  tick_count = tick_count % 60;
   if ( tick_count === 0 ) {
 		update_state();
   }
