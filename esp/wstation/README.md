@@ -24,6 +24,44 @@ $ mos --port "ws://wsta-01.lan/rpc" get conf9.json
 }
 
 
+### openHAB2 configuration
+
+connect to MQTT broker of the hab
+
+```
+mos --port "ws://wsta-01.lan/rpc" config-set \
+  mqtt.enable=true \
+  mqtt.client_id="wsta1" \
+  mqtt.server="hab2.lan:1883" \
+  mqtt.user="" mqtt.pass="" \
+  debug.stderr_topic="" debug.stdout_topic="" \
+  debug.udp_log_addr="192.168.0.31:1993"
+
+```
+
+item entries:
+
+```
+	Number Wsta1_RAM "RAM Free" {mqtt="<[local_broker:hab2/sensors/wsta1/state:state:JSONPATH($.memory)]"}
+	Number Wsta1_Temp "Temperature [%.1f °C]" {mqtt="<[local_broker:hab2/sensors/wsta1/state:state:JSONPATH($.data.temp)]"}
+	Number Wsta1_Humidity "Humidity [%d %%]" {mqtt="<[local_broker:hab2/sensors/wsta1/state:state:JSONPATH($.data.humid)]"}
+	Number Wsta1_Pressure "Pressure [%d hPa]" {mqtt="<[local_broker:hab2/sensors/wsta1/state:state:JSONPATH($.data.pressure)]"}
+	Number Wsta1_Inactivity "Inactivity [%d sec]" {mqtt="<[local_broker:hab2/sensors/wsta1/state:state:JSONPATH($.data.inactivity)]"}
+
+```
+
+
+sitemap entries:
+
+```
+    Text item=Wsta1_RAM label="Wsta1 RAM Free [%d bytes]" icon="line-stagnation"
+    Text item=Wsta1_Temp label="Temperature [%.1f °C]" icon="temperature"
+    Text item=Wsta1_Humidity label="Humidity [%d %%]" icon="humidity"
+    Text item=Wsta1_Pressure label="Pressure [%d hPa]" icon="line-stagnation"
+    Text item=Wsta1_Inactivity label="Inactivity [%d sec]" icon="line-stagnation"
+```
+
+
 ### OTA
 
 Place fw.zip into a web folder, then:
