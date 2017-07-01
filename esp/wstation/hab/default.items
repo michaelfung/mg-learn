@@ -1,0 +1,9 @@
+Switch HabTest1_Switch "Lights Switch" {mqtt=">[local_broker:hab2/switch/habtest1:command:*:MAP(habtest1.map)], <[local_broker:hab2/switch/habtest1/state:state:JSONPATH($.data[0].status)]"}
+Number HabTest1_RAM "RAM Free" {mqtt="<[local_broker:hab2/switch/habtest1/state:state:JSONPATH($.memory)]"}
+
+String Wsta1_State "State Update" {mqtt="<[local_broker:hab2/sensors/wsta1/state:state:default]"}
+Number Wsta1_RAM "RAM Free"
+Number Wsta1_Temp "Temperature [%.1f °C]"
+Number Wsta1_Humidity "Humidity [%d %%]"
+Number Wsta1_Pressure "Pressure [%d hPa]"
+Number Wsta1_Inactivity "Inactivity [%d sec]"

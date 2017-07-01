@@ -1,0 +1,38 @@
+var String ThingSpeakKey = 'RDW7QK8IE5NON9KJ'
+
+rule ExtractStates
+when
+	Item Wsta1_State received update
+
+then
+	var String json = Wsta1_State.state.toString
+	logInfo("rules", "ExtractStates from:" + json)
+
+	var String ram = transform("JSONPATH", "$.memory", json)
+	var String temp = transform("JSONPATH", "$.data.temp", json)
+	var String humid = transform("JSONPATH", "$.data.humid", json)
+	var String pressure = transform("JSONPATH", "$.data.pressure", json)
+	var String inactivity = transform("JSONPATH", "$.data.inactivity", json)
+
+	logInfo("rules", "ram " + ram + " temp " + temp)
+
+	Wsta1_RAM.postUpdate(ram)
+	Wsta1_Temp.postUpdate(temp)
+	Wsta1_Humidity.postUpdate(humid)
+	Wsta1_Pressure.postUpdate(pressure)
+	Wsta1_Inactivity.postUpdate(inactivity)
+
+end
+
+
+rule FeedThingSpeak
+when
+	Item Wsta1_Temp received update
+then
+
+	var String url
+	var String result
+	url = "http://api.thingspeak.com/update?api_key=" + ThingSpeakKey + "&field1=" + Wsta1_Temp.state
+    result = sendHttpGetRequest(url);
+	logInfo("rules", "ThingSpeak feed result:" + result)
+end
