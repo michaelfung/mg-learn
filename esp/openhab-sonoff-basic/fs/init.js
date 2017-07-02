@@ -16,8 +16,8 @@ load('api_log.js');
 
 // init variables / constants
 let thing_id = Cfg.get('mqtt.client_id');
-let hab_control_topic = 'hab2/switch/' + thing_id;
-let hab_state_topic = 'hab2/switch/' + thing_id + '/state';
+let hab_control_topic = 'sonoff_basic/' + thing_id;
+let hab_state_topic = 'sonoff_basic/' + thing_id + '/state';
 let led_onboard = 13; // Sonoff LED pin
 let relay_pin = 12;  // Sonoff relay pin
 let spare_pin = 14;  // Sonoff not connected

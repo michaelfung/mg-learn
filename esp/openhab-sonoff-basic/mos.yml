@@ -1,4 +1,4 @@
-name: openhab_test
+name: openhab_sonoff_basic
 # arch: PLATFORM
 version: 1.0
 skeleton_version: 2017-05-18
@@ -9,15 +9,15 @@ filesystem:
 libs:
     # common mgos libs
   - origin: https://github.com/mongoose-os-libs/http-server
-  - origin: https://github.com/mongoose-os-libs/i2c
-  - origin: https://github.com/mongoose-os-libs/ota-http-server
+  #- origin: https://github.com/mongoose-os-libs/i2c
+  #- origin: https://github.com/mongoose-os-libs/ota-http-server
   - origin: https://github.com/mongoose-os-libs/rpc-loopback
   - origin: https://github.com/mongoose-os-libs/rpc-mqtt
   - origin: https://github.com/mongoose-os-libs/rpc-service-config
   - origin: https://github.com/mongoose-os-libs/rpc-service-fs
   - origin: https://github.com/mongoose-os-libs/rpc-service-gpio
-  - origin: https://github.com/mongoose-os-libs/rpc-service-i2c
-  - origin: https://github.com/mongoose-os-libs/rpc-service-ota
+  #- origin: https://github.com/mongoose-os-libs/rpc-service-i2c
+  #- origin: https://github.com/mongoose-os-libs/rpc-service-ota
   - origin: https://github.com/mongoose-os-libs/rpc-uart
   - origin: https://github.com/mongoose-os-libs/spi
   - origin: https://github.com/mongoose-os-libs/vfs-dev-spi-flash
@@ -27,7 +27,7 @@ libs:
   - origin: https://github.com/mongoose-os-libs/mjs
 config_schema:
   - ["debug.level", 3]
-  - ["device.id", "habtest1"]
+  - ["device.id", "em-009"]
   - ["i2c.enable", false]
   - ["wifi.sta.ssid", "TOTO_2G"]
   - ["wifi.sta.pass", "hackmeifyoucan"]
@@ -35,8 +35,9 @@ config_schema:
   - ["wifi.ap.keep_enabled", false]
   - ["mqtt.enable", true]
   - ["mqtt.server", "hab2.lan:1883"]
-  - ["mqtt.client_id", "habtest1"]
-  - ["mqtt.pub", "s", "hab2/habtest1/online", {title: "online topic"}]
+  - ["mqtt.client_id", "em-009"]
+  - ["mqtt.pub", "s", "sonoff_basic/em-009/online", {title: "online topic"}]
 build_vars:
-  # FS_SIZE: 196608
-  # MGOS_ENABLE_ONEWIRE: 1
+  FLASH_SIZE: 1048576
+
+
