@@ -22,7 +22,7 @@ let led_onboard = 13; // Sonoff LED pin
 let relay_pin = 12;  // Sonoff relay pin
 let spare_pin = 14;  // Sonoff not connected
 let button_pin = 0;  // Sonoff push button
-let relay_state = 'OFF';
+//let relay_state = 'OFF';
 let relay_value = 0;
 let last_toggle = 0;
 let tick_count = 0;
@@ -42,7 +42,7 @@ let update_state = function() {
     let pubmsg = JSON.stringify({
         uptime: Sys.uptime(),
         memory: Sys.free_ram(),
-        relay_state: relay_state
+        relay_state: ( relay_value ? 'ON' : 'OFF' )
     });
     let ok = MQTT.pub(hab_state_topic, pubmsg);
     Log.print(Log.INFO, 'Published:' + (ok ? 'OK' : 'FAIL') + ' topic:' + hab_state_topic + ' msg:' +  pubmsg);
@@ -75,12 +75,12 @@ MQTT.sub(hab_control_topic, function(conn, topic, command) {
         if ( command === 'ON' ) {
             if ( (Sys.uptime() - last_toggle ) > 2 ) {
                 GPIO.write(relay_pin, 1);  // set switch to on
-                relay_state.value = 1;
+                relay_value = 1;
                 last_toggle = Sys.uptime();
             }
         } else if ( command === 'OFF' ) {
                    GPIO.write(relay_pin, 0);  // set switch to off
-                   relay_state.value = 0;
+                   relay_value = 0;
                    last_toggle = Sys.uptime();
         } else {
 			Log.print(Log.ERROR, 'Unsupported command');

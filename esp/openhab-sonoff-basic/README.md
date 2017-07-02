@@ -28,7 +28,7 @@ sitemap default label="Home Sweet Home"
 	Frame label="Bedroom" {
 		Switch item=Bedroom_Lights_Switch label="Lights Switch"
 		Text item=Bedroom_Lights_Switch_RAM label="RAM Free [%d bytes]" icon="line-stagnation"
-		Text item=Bedroom_Lights_Switch_Uptime label="Uptime [%d sec]" icon="line-stagnation"
+		Text item=Bedroom_Lights_Switch_Uptime label="Uptime [%.0f sec]" icon="line-stagnation"
 	}
 }
 ```

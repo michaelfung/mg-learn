@@ -66,7 +66,7 @@ let UpdateReadings = function() {
         readings.inactivity = inactivity / 1000;
 
 		let pubmsg = JSON.stringify({
-			uptime: Sys.uptime(),
+			uptime: Math.floor(Sys.uptime()),
 			memory: Sys.free_ram(),
 			data: readings
 		});
