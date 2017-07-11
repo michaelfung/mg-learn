@@ -11,15 +11,12 @@ load('api_sys.js');
 load('api_arduino_ssd1306.js');
 load('api_arduino_bme280.js');
 load('api_mqtt.js');
-//load('api_http.js');
 load('api_math.js');
 
 /* vars declare */
 let thing_id = Cfg.get('mqtt.client_id');
 let pir_pin = 13;
-//let ThingSpeakKey = Cfg.get('thingspeak.key');
 let motion_count = 0;
-// let last_motion_ts = 0;  // use if need high inactive precision
 let inactivity = 0;  // no motion detected for n ms
 let has_bme = false;
 let read_interval = 5000;  // read sensors every n ms
@@ -108,7 +105,7 @@ Timer.set(read_interval , true, function() {
     tickcount++;
 
     // update readings every tick_n seconds
-    if ((tickcount % tick_60s) === 0) {
+    if ((tickcount % tick_300s) === 0) {
 
         localts = Math.floor(Timer.now()) + 28800  /* HKT (8 x 3600s) */;
         hour = localts % 86400;
