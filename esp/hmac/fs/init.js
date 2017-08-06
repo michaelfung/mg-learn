@@ -7,6 +7,8 @@ load('api_timer.js');
 // Helper C function get_led_gpio_pin() in src/main.c returns built-in LED GPIO
 let led = ffi('int get_led_gpio_pin()')();
 
+let getDigest = ffi('char *get_hexdigest()');
+
 let getInfo = function() {
   return JSON.stringify({total_ram: Sys.total_ram(), free_ram: Sys.free_ram()});
 };
