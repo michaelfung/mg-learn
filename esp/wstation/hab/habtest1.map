@@ -1,0 +1,2 @@
+ON={"op": "set", "dev_id": 1, "value": 1}
+OFF={"op": "set", "dev_id": 1, "value": 0}

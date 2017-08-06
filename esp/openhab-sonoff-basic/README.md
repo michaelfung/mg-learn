@@ -14,16 +14,22 @@ This will target openHAB2.
 Add this to file `default.items` under folder `conf/items/`:
 
 ```
-Switch HabTest1 {mqtt=">[broker:hab2/switch/habtest1:command:ON:1],>[broker:hab2/switch/habtest1:command:OFF:0],<[broker:hab2/switch/habtest1:state:ON:1],<[broker:hab2/switch/habtest1:state:OFF:0]"}
+Switch Bedroom_Lights_Switch "Lights Switch" {mqtt=">[local_broker:sonoff_basic/em-009:command:*:${command}], <[local_broker:sonoff_basic/em-009/state:state:JSONPATH($.relay_state)]"}
+Number Bedroom_Lights_Switch_RAM "RAM Free" {mqtt="<[local_broker:sonoff_basic/em-009/state:state:JSONPATH($.memory)]"}
+Number Bedroom_Lights_Switch_Uptime "Uptime" {mqtt="<[local_broker:sonoff_basic/em-009/state:state:JSONPATH($.uptime)]"}
 ```
 
 Also add entry to sitemap like this:
 
 ```
-sitemap default label="My first sitemap"
+sitemap default label="Home Sweet Home"
 {
-	Switch item=Presence_Mobile_Michael label="Michael Mobile"
-	Switch item=HabTest1 label="HabTest1 Lights Switch"
+
+	Frame label="Bedroom" {
+		Switch item=Bedroom_Lights_Switch label="Lights Switch"
+		Text item=Bedroom_Lights_Switch_RAM label="RAM Free [%d bytes]" icon="line-stagnation"
+		Text item=Bedroom_Lights_Switch_Uptime label="Uptime [%.0f sec]" icon="line-stagnation"
+	}
 }
 ```
 

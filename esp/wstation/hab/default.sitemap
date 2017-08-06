@@ -1,0 +1,16 @@
+sitemap default label="Home Sweet Home" {
+
+    Frame label="Breadboard 1" {
+        Switch item=HabTest1_Switch label="Lights Switch" icon="light"
+        Text item=HabTest1_RAM label="HabTest1 RAM Free [%d bytes]" icon="line-stagnation"
+    }
+
+    Frame label="Wstation 1" {
+        Text item=Wsta1_RAM label="ESP8266 RAM Free [%d bytes]" icon="line-stagnation"
+        Text item=Wsta1_Temp label="Temperature [%.1f °C]" icon="temperature"
+        Text item=Wsta1_Humidity label="Humidity [%d %%]" icon="humidity"
+        Text item=Wsta1_Pressure label="Pressure [%d hPa]" icon="line-stagnation"
+        Text item=Wsta1_Inactivity label="Inactivity [%d sec]" icon="line-stagnation"
+    }
+
+}
