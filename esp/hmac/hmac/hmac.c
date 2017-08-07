@@ -1,3 +1,8 @@
+/*
+ * Wrapper for mbedtls HMAC functions
+ * for use with mJS
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 #include "common/platform.h"
@@ -14,7 +19,7 @@ unsigned char digest[20];
 static char hexdigest[41];
 
 // helper functions
-static uint8_t hexdec(const char *s) {
+static uint8_t hexdec(const char *s) {  /* borrowed from frozen */
 #define HEXTOI(x) (x >= '0' && x <= '9' ? x - '0' : x - 'W')
   int a = tolower(*(const unsigned char *) s);
   int b = tolower(*(const unsigned char *) (s + 1));
@@ -37,18 +42,17 @@ void tohex(unsigned char * in, size_t insz, char * out /* , size_t outsz */) {
 
 
 // FFI'able functions:
-
 /*
  * load 128 bit key from a hexstring
  * must be 32 characters or more
  */
 int hmac_set_key(char *hexstring) {
 	char *hexstrptr = hexstring;
-/*
-	if (sizeof(hexstring) < 32) {
+
+	if (strlen(hexstring) < 32) {
 		return 1;
 	}
-*/
+
 	int i = 0;
 	for (;  i < 16; i++) {
 		key[i] = hexdec(hexstrptr);
@@ -88,11 +92,14 @@ int hmac_compute_digest(const char *buf) {
 	if (mbedtls_md_hmac_finish(&ctx, digest) != 0) {
 		return 1;
 	}
-	// convert digest to hexdigest
+	// convert digest to hex string
 	size_t insz =  sizeof(digest);
 	// size_t outsz = sizeof(hexdigest);
 	tohex(digest, insz, hexdigest /* , outsz */);
 	return 0;
 }
 
-/* reset to make ready to another calculate digest */
+/* reset to make ready to compute another digest */
+int hmac_reset_ctx() {
+	return mbedtls_md_hmac_reset(&ctx);
+}

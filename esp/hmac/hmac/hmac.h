@@ -7,5 +7,6 @@ int hmac_init_ctx();
 int hmac_inject_key();
 int hmac_compute_digest(const char *buf);
 char *hmac_get_hexdigest();
+int hmac_reset_ctx();
 
 #endif

@@ -11,20 +11,9 @@ let HMAC = {
 	_injectKey: ffi('int hmac_inject_key()'),
 	_computeDigest: ffi('int hmac_compute_digest(char *)'),
 	_getDigest: ffi('char *hmac_get_hexdigest()'),
+	_resetCtx: ffi('int hmac_reset_ctx()'),
 
-	setKey: function(hexstring) {
-		if (hexstring.length < 32) {
-			print('hexstring too short');
-			return false;
-		}
-		let ret = this._setKey(hexstring);
-		if (ret === 0) {
-			return true;
-		} else {
-			return false;
-		}
-	},
-
+	/* run this first */
 	initCtx: function() {
 		if (this._initCtx() === 0) {
 			return true;
@@ -32,18 +21,34 @@ let HMAC = {
 			return false;
 		}
 	},
-	injectKey: function() {
+
+	/* if initCtx is successful, do this */
+	setKey: function(hexstring) {
+		if (hexstring.length < 32) {
+			return false;
+		}
+		let ret = this._setKey(hexstring);
+		if (ret !== 0) {
+			return false;
+		}
 		if (this._injectKey() === 0) {
 			return true;
 		} else {
 			return false;
 		}
 	},
+
+	/* after key is set, use this to get digest of data. */
 	getDigest: function(data) {
+		let res = null;
 		if (this._computeDigest(data) !== 0) {
-			return null;
+			// return null;
+		} else {
+			res = this._getDigest();
 		}
-		return this._getDigest();
+		// clean up for next _computeDigest operation
+		this._resetCtx();
+		return res;
 	}
 };
 
@@ -51,30 +56,24 @@ let HMAC = {
 let led = ffi('int get_led_gpio_pin()')();
 
 let ok = false;
+
+	if (HMAC.initCtx()) {
+		print('HMAC ctx init OK');
+		ok = true;
+	}
+
 let keystring = "d5aa9600d5aa9600d5aa9600d5aa9600";
 
 ok = HMAC.setKey(keystring);
 print('HMAC setKey ', ok ? 'OK' : 'Failed');
 
 if (ok) {
-	if (HMAC.initCtx()) {
-		print('HMAC ctx init OK');
-
-		ok = HMAC.injectKey();
-		print('HMAC injectKey ', ok ? 'OK' : 'FAiled');
-
-		if (ok) {
-			let data = "hello world";
-
-			let digest = HMAC.getDigest(data);
-			if (digest === null) {
-				print('HMAC getDigest Failed.');
-			} else {
-				print('HMAC getDigest: ', digest);
-			}
-		}
+	let data = "hello world";
+	let digest = HMAC.getDigest(data);
+	if (digest === null) {
+		print('HMAC getDigest Failed.');
 	} else {
-		print('HMAC fail ctx init');
+		print('HMAC getDigest: ', digest);
 	}
 }
 
