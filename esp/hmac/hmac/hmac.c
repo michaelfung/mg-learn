@@ -6,7 +6,7 @@
 #include "hmac.h"
 
 // data
-static mbedtls_md_context_t *ctx;
+static mbedtls_md_context_t ctx;
 const mbedtls_md_info_t *md_info;
 static unsigned char key[16];
 static size_t keylen = 16;
@@ -44,9 +44,11 @@ void tohex(unsigned char * in, size_t insz, char * out /* , size_t outsz */) {
  */
 int hmac_set_key(char *hexstring) {
 	char *hexstrptr = hexstring;
+/*
 	if (sizeof(hexstring) < 32) {
 		return 1;
 	}
+*/
 	int i = 0;
 	for (;  i < 16; i++) {
 		key[i] = hexdec(hexstrptr);
@@ -63,19 +65,19 @@ char *hmac_get_hexdigest() {
 /* combine both init and setup of the hash operation ctx */
 int hmac_init_ctx() {
  md_info = mbedtls_md_info_from_type( MBEDTLS_MD_SHA1 );
- mbedtls_md_init( ctx );
- return mbedtls_md_setup( ctx, md_info, 1 );  // param 'hmac' set to 1
+ mbedtls_md_init( &ctx );
+ return mbedtls_md_setup( &ctx, md_info, 1 );  // param 'hmac' set to 1
 }
 
 /* inject key to ctx */
 int hmac_inject_key() {
-		return mbedtls_md_hmac_starts( ctx, key, keylen );
+		return mbedtls_md_hmac_starts( &ctx, key, keylen );
 }
 
-/* calculate digest of a buffer */
-int hmac_compute_digest(const unsigned char *buf) {
-	size_t bufsz = sizeof(buf) - 1;
-	if (mbedtls_md_hmac_update(ctx, buf, bufsz) != 0) {
+/* calculate digest of string data buffer */
+int hmac_compute_digest(const char *buf) {
+	size_t bufsz = strlen(buf);
+	if (mbedtls_md_hmac_update(&ctx, (unsigned char *)buf, bufsz) != 0) {
 		return 1;
 	}
 
@@ -83,7 +85,7 @@ int hmac_compute_digest(const unsigned char *buf) {
 	memset(digest, 0, sizeof(digest));
 	memset(hexdigest, '\0', sizeof(hexdigest));
 
-	if (mbedtls_md_hmac_finish(ctx, digest) != 0) {
+	if (mbedtls_md_hmac_finish(&ctx, digest) != 0) {
 		return 1;
 	}
 	// convert digest to hexdigest

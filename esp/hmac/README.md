@@ -1,7 +1,7 @@
 ### Test adding hmac-sha1 to mjs
 
 
-mos build --local --clean --no-libs-update --repo ~/git/mongoose-os --arch esp32
+mos build --local --clean --no-libs-update --repo ~/git/mongoose-os --arch esp8266
 
 
 

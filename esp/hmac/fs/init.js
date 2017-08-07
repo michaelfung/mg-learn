@@ -4,20 +4,20 @@ load('api_mqtt.js');
 load('api_sys.js');
 load('api_timer.js');
 
-
-
 let HMAC = {
 
 	_setKey: ffi('int hmac_set_key(char *)'),
+	_initCtx: ffi('int hmac_init_ctx()'),
 	_injectKey: ffi('int hmac_inject_key()'),
 	_computeDigest: ffi('int hmac_compute_digest(char *)'),
 	_getDigest: ffi('char *hmac_get_hexdigest()'),
 
 	setKey: function(hexstring) {
 		if (hexstring.length < 32) {
+			print('hexstring too short');
 			return false;
 		}
-		let ret = this._setkey(hexstring);
+		let ret = this._setKey(hexstring);
 		if (ret === 0) {
 			return true;
 		} else {
@@ -25,9 +25,15 @@ let HMAC = {
 		}
 	},
 
-	initCtx: ffi('int hmac_init_ctx()'),
+	initCtx: function() {
+		if (this._initCtx() === 0) {
+			return true;
+		} else {
+			return false;
+		}
+	},
 	injectKey: function() {
-		if (this._injectKey()) === 0) {
+		if (this._injectKey() === 0) {
 			return true;
 		} else {
 			return false;
@@ -39,28 +45,37 @@ let HMAC = {
 		}
 		return this._getDigest();
 	}
-
 };
 
 // Helper C function get_led_gpio_pin() in src/main.c returns built-in LED GPIO
 let led = ffi('int get_led_gpio_pin()')();
 
 let ok = false;
+let keystring = "d5aa9600d5aa9600d5aa9600d5aa9600";
 
-ok = HMAC.setKey('d5aa9600d5aa9600d5aa9600d5aa9600');
-print('HMAC setKey ', ok ? 'OK' : 'FAiled');
+ok = HMAC.setKey(keystring);
+print('HMAC setKey ', ok ? 'OK' : 'Failed');
 
-HMAC.initCtx();
-ok = HMAC.injectKey();
-print('HMAC injectKey ', ok ? 'OK' : 'FAiled');
+if (ok) {
+	if (HMAC.initCtx()) {
+		print('HMAC ctx init OK');
 
-let data = 'hello world';
+		ok = HMAC.injectKey();
+		print('HMAC injectKey ', ok ? 'OK' : 'FAiled');
 
-let digest = HMAC.getDigest(data);
-if (digest === null) {
-	print('HMAC getDigest Failed.');
-} else {
-	print('HMAC getDigest: ', digest);
+		if (ok) {
+			let data = "hello world";
+
+			let digest = HMAC.getDigest(data);
+			if (digest === null) {
+				print('HMAC getDigest Failed.');
+			} else {
+				print('HMAC getDigest: ', digest);
+			}
+		}
+	} else {
+		print('HMAC fail ctx init');
+	}
 }
 
 let getInfo = function() {
