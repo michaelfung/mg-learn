@@ -21,7 +21,7 @@ static uint8_t hexdec(const char *s) {
   return (HEXTOI(a) << 4) | HEXTOI(b);
 }
 
-void tohex(unsigned char * in, size_t insz, char * out, size_t outsz) {
+void tohex(unsigned char * in, size_t insz, char * out /* , size_t outsz */) {
     unsigned char *pin = in;
     const char *hex = "0123456789ABCDEF";
     char *pout = out;
@@ -42,7 +42,7 @@ void tohex(unsigned char * in, size_t insz, char * out, size_t outsz) {
  * load 128 bit key from a hexstring
  * must be 32 characters or more
  */
-int load_key(char *hexstring) {
+int hmac_set_key(char *hexstring) {
 	char *hexstrptr = hexstring;
 	if (sizeof(hexstring) < 32) {
 		return 1;
@@ -56,31 +56,25 @@ int load_key(char *hexstring) {
 }
 
 /* get hexdigest  */
-char *get_hexdigest() {
+char *hmac_get_hexdigest() {
 	return hexdigest;
 }
 
 /* combine both init and setup of the hash operation ctx */
-int init_ctx() {
+int hmac_init_ctx() {
  md_info = mbedtls_md_info_from_type( MBEDTLS_MD_SHA1 );
  mbedtls_md_init( ctx );
  return mbedtls_md_setup( ctx, md_info, 1 );  // param 'hmac' set to 1
 }
 
-/* inject key to ctx
- * keylen    length of the HMAC key in bytes
- */
-int inject_key(size_t keylen) {
-	if (keylen < 32) {
-		return 1;
-	} else {
+/* inject key to ctx */
+int hmac_inject_key() {
 		return mbedtls_md_hmac_starts( ctx, key, keylen );
-	}
 }
 
 /* calculate digest of a buffer */
-int compute_digest(const unsigned char *buf) {
-	size_t bufsz = sizeof(buf);
+int hmac_compute_digest(const unsigned char *buf) {
+	size_t bufsz = sizeof(buf) - 1;
 	if (mbedtls_md_hmac_update(ctx, buf, bufsz) != 0) {
 		return 1;
 	}
@@ -94,8 +88,8 @@ int compute_digest(const unsigned char *buf) {
 	}
 	// convert digest to hexdigest
 	size_t insz =  sizeof(digest);
-	size_t outsz = sizeof(hexdigest);
-	tohex(digest, insz, hexdigest, outsz);
+	// size_t outsz = sizeof(hexdigest);
+	tohex(digest, insz, hexdigest /* , outsz */);
 	return 0;
 }
 
