@@ -73,7 +73,15 @@ if (ok) {
 	if (digest === null) {
 		print('HMAC getDigest Failed.');
 	} else {
-		print('HMAC getDigest: ', digest);
+		print('hello_world : ', digest);
+	}
+
+	data = '{"desired":{"power":"ON"}}';
+	let digest = HMAC.getDigest(data);
+	if (digest === null) {
+		print('HMAC getDigest Failed for desired.');
+	} else {
+		print('desired : ', digest);
 	}
 }
 
