@@ -3,12 +3,19 @@ test
 
 table
 
-=====  =====          =======
-A      B              notes
-=====  =====       =======
-URI  /api/v1/auth  get  auth token
-method  post  n/a
-params email  n/a
-result token  n/a
-=====  =====  =======
 
+
+This is a top-level paragraph.
+
+    This paragraph belongs to a first-level block quote.
+
+        This paragraph belongs to a second-level block quote.
+
+Another top-level paragraph.
+
+        This paragraph belongs to a second-level block quote.
+
+    This paragraph belongs to a first-level block quote.  The
+    second-level block quote above is inside this first-level
+    block quote.
+    
