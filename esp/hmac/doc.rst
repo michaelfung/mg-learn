@@ -4,11 +4,11 @@ test
 table
 
 =====  =====  =======
-A      B      A and B
+A      B      notes
 =====  =====  =======
-False  False  False
-True   False  False
-False  True   False
-True   True   True
+URI  /api/v1/auth  get  auth token
+method  post  
+params email
+result token
 =====  =====  =======
 
